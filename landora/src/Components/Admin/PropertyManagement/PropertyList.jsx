@@ -17,9 +17,9 @@ const sidebarBackground = `
 const menuItems = [
   { text: 'Main Dashboard', icon: faTachometerAlt, path: '/admindashboard/dashboard' },
   { text: 'Property List', icon: faUsers, path: '/ property-management/list' },
-  { text: 'Menu Item 1', icon: faBuilding, path: '/ property-management/1' },
-  { text: 'Menu Item 2', icon: faSackDollar, path: '/ property-management/2' },
-  { text: 'Menu Item 3', icon: faHammer, path: '/ property-management/3' },
+  //{ text: 'Menu Item 1', icon: faBuilding, path: '/ property-management/1' },
+  //{ text: 'Menu Item 2', icon: faSackDollar, path: '/ property-management/2' },
+  //{ text: 'Menu Item 3', icon: faHammer, path: '/ property-management/3' },
 ];
 
 function PropertyList() {

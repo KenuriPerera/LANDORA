@@ -19,6 +19,7 @@ import UserDetails from './Components/Admin/UserManagement/UserDetails';
 import AddUser from './Components/Admin/UserManagement/AddUser';
 import UpdateUser from './Components/Admin/UserManagement/UpdateUser';
 
+
 import { AuthProvider } from './Components/Auth/AuthContext';  // Import AuthProvider
 import MakePayment from './Components/pages/MakePayment';
 
@@ -92,6 +93,7 @@ function App() {
             <Route path="Vendor" element={<VendorManagement />} />
             <Route path="Costs" element={<Cost />} />
             <Route path="Schedules" element={<Schedules />} />
+            
           </Route>
 
 

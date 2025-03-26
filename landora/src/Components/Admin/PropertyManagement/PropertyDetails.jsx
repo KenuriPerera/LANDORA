@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { properties } from '../Database/Data';
-import { Container, Typography, List, ListItem, ListItemText, Paper, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import DeleteIcon from '@mui/icons-material/Delete';
-
+import React, { useState } from "react";
+import { properties } from "../Database/Data";
+import { Container, Typography, List, ListItem, ListItemText, Paper, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const PropertyDashboard = () => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -31,18 +33,42 @@ const PropertyDashboard = () => {
     };
 
     const handleSaveProperty = () => {
-        setPropertyList(propertyList.map(property => property.id === selectedProperty.id ? selectedProperty : property));
+        setPropertyList(propertyList.map(property => 
+            property.id === selectedProperty.id ? selectedProperty : property
+        ));
         setEditOpenDialog(false);
     };
 
+    const generateReport = () => {
+        const doc = new jsPDF();
+        doc.text("Property Report", 14, 20);
+
+        const tableColumn = ["Name", "Location", "Price", "Description", "Availability"];
+        const tableRows = propertyList.map((property) => [
+            property.name || property.title, 
+            property.location, 
+            property.price, 
+            property.description, 
+            property.availability ? "Available" : "Not Available"
+        ]);
+
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 30,
+        });
+
+        doc.save("Property_report.pdf");
+    };
+
     const filteredProperties = propertyList.filter(property =>
-        property.title.toLowerCase().includes(searchQuery.toLowerCase())
+        (property.name || property.title).toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
         <Container>
             <Typography variant="h4" component="h1" gutterBottom>
-                Property List
+                Property Listings Landora
             </Typography>
             <TextField
                 label="Search by Property Name"
@@ -52,16 +78,26 @@ const PropertyDashboard = () => {
                 fullWidth
                 margin="normal"
             />
+            <Button
+                variant="contained"
+                color="secondary"
+                startIcon={<PictureAsPdfIcon />}
+                onClick={generateReport}
+                style={{ marginBottom: "10px" }}
+            >
+                Generate Report
+            </Button>
             <List>
                 {filteredProperties.map(property => (
-                    <Paper key={property.id} elevation={3} style={{ margin: '10px 0', padding: '10px' }}>
-                        <ListItem >
+                    <Paper key={property.id} elevation={3} style={{ margin: "10px 0", padding: "10px" }}>
+                        <ListItem>
                             <ListItemText
-                                primary={<Typography variant="h6">{property.title}</Typography>}
+                                primary={<Typography variant="h6">{property.name || property.title}</Typography>}
                                 secondary={
                                     <>
                                         <Typography variant="body2">Location: {property.location}</Typography>
                                         <Typography variant="body2">Price: {property.price}</Typography>
+                                        <Typography variant="body2">Description: {property.description}</Typography>
                                     </>
                                 }
                             />
@@ -79,17 +115,17 @@ const PropertyDashboard = () => {
                 ))}
             </List>
 
-            {/* View/Edit Property Dialog */}
+            {/* View Property Dialog */}
             <Dialog open={openViewDialog && !editMode} onClose={() => setViewOpenDialog(false)}>
                 <DialogTitle>Property Details</DialogTitle>
                 <DialogContent>
                     {selectedProperty && (
                         <div>
-                            <Typography variant="h6" gutterBottom><strong>Title:</strong> {selectedProperty.title}</Typography>
+                            <Typography variant="h6" gutterBottom><strong>Title:</strong> {selectedProperty.name || selectedProperty.title}</Typography>
                             <Typography variant="body1" gutterBottom><strong>Location:</strong> {selectedProperty.location}</Typography>
                             <Typography variant="body1" gutterBottom><strong>Price:</strong> {selectedProperty.price}</Typography>
-                            <Typography variant="body1" gutterBottom><strong>Buyer ID:</strong> {selectedProperty.buyerID}</Typography>
-                            <Typography variant="body1" gutterBottom><strong>Vendor ID:</strong> {selectedProperty.VendorID}</Typography>
+                            <Typography variant="body1" gutterBottom><strong>Buyer ID:</strong> {selectedProperty.buyerID || 'N/A'}</Typography>
+                            <Typography variant="body1" gutterBottom><strong>Vendor ID:</strong> {selectedProperty.vendorID || 'N/A'}</Typography>
                             <Typography variant="body1" gutterBottom><strong>Description:</strong> {selectedProperty.description}</Typography>
                         </div>
                     )}
@@ -98,68 +134,70 @@ const PropertyDashboard = () => {
                     <Button onClick={() => setViewOpenDialog(false)} color="primary">Close</Button>
                 </DialogActions>
             </Dialog>
+
+            {/* Edit Property Dialog */}
             <Dialog open={openEditDialog} onClose={() => setEditOpenDialog(false)}>
-                <DialogTitle>{editMode ? 'Edit Property' : 'Property Details'}</DialogTitle>
+                <DialogTitle>Edit Property</DialogTitle>
                 <DialogContent>
                     {selectedProperty && (
-                        <div>
+                        <>
                             <TextField
                                 label="Title"
-                                value={selectedProperty.title}
-                                onChange={(e) => setSelectedProperty({ ...selectedProperty, title: e.target.value })}
+                                value={selectedProperty.name || selectedProperty.title}
+                                onChange={(e) => setSelectedProperty({ 
+                                    ...selectedProperty, 
+                                    name: e.target.value,
+                                    title: e.target.value 
+                                })}
                                 fullWidth
                                 margin="normal"
-                                disabled={!editMode}
                             />
                             <TextField
                                 label="Location"
                                 value={selectedProperty.location}
-                                onChange={(e) => setSelectedProperty({ ...selectedProperty, location: e.target.value })}
+                                onChange={(e) => setSelectedProperty({ 
+                                    ...selectedProperty, 
+                                    location: e.target.value 
+                                })}
                                 fullWidth
                                 margin="normal"
-                                disabled={!editMode}
                             />
                             <TextField
                                 label="Price"
                                 value={selectedProperty.price}
-                                onChange={(e) => setSelectedProperty({ ...selectedProperty, price: e.target.value })}
+                                onChange={(e) => setSelectedProperty({ 
+                                    ...selectedProperty, 
+                                    price: e.target.value 
+                                })}
                                 fullWidth
                                 margin="normal"
-                                disabled={!editMode}
-                            />
-                            <TextField
-                                label="Buyer ID"
-                                value={selectedProperty.buyerID}
-                                onChange={(e) => setSelectedProperty({ ...selectedProperty, buyerID: e.target.value })}
-                                fullWidth
-                                margin="normal"
-                                disabled={!editMode}
-                            />
-                            <TextField
-                                label="Vendor ID"
-                                value={selectedProperty.VendorID}
-                                onChange={(e) => setSelectedProperty({ ...selectedProperty, VendorID: e.target.value })}
-                                fullWidth
-                                margin="normal"
-                                disabled={!editMode}
                             />
                             <TextField
                                 label="Description"
                                 value={selectedProperty.description}
-                                onChange={(e) => setSelectedProperty({ ...selectedProperty, description: e.target.value })}
+                                onChange={(e) => setSelectedProperty({ 
+                                    ...selectedProperty, 
+                                    description: e.target.value 
+                                })}
                                 fullWidth
                                 margin="normal"
-                                disabled={!editMode}
                             />
-                        </div>
+                            <TextField
+                                label="Avalability"
+                                value={selectedProperty.availability}
+                                onChange={(e) => setSelectedProperty({ 
+                                    ...selectedProperty, 
+                                    description: e.target.value 
+                                })}
+                                fullWidth
+                                margin="normal"
+                            />
+                        </>
                     )}
                 </DialogContent>
                 <DialogActions>
-                    {editMode ? (
-                        <Button onClick={handleSaveProperty} color="primary">Save</Button>
-                    ) : (
-                        <Button onClick={() => setEditOpenDialog(false)} color="primary">Close</Button>
-                    )}
+                    <Button onClick={() => setEditOpenDialog(false)} color="secondary">Cancel</Button>
+                    <Button onClick={handleSaveProperty} color="primary">Save</Button>
                 </DialogActions>
             </Dialog>
         </Container>
@@ -167,74 +205,3 @@ const PropertyDashboard = () => {
 };
 
 export default PropertyDashboard;
-
-
-// const PropertyDashboard = () => {
-//     const [searchQuery, setSearchQuery] = useState("");
-//     const [selectedProperty, setSelectedProperty] = useState(null);
-//     const [openDialog, setOpenDialog] = useState(false);
-
-//     const handleViewProperty = (property) => {
-//         setSelectedProperty(property);
-//         setOpenDialog(true);
-//     };
-
-//     const filteredProperties = properties.filter(property =>
-//         property.title.toLowerCase().includes(searchQuery.toLowerCase())
-//     );
-
-//     return (
-//         <Container>
-//             <Typography variant="h4" component="h1" gutterBottom>
-//                 Property List
-//             </Typography>
-//             <TextField
-//                 label="Search by Property Name"
-//                 variant="outlined"
-//                 value={searchQuery}
-//                 onChange={(e) => setSearchQuery(e.target.value)}
-//                 fullWidth
-//                 margin="normal"
-//             />
-//             <List>
-//                 {filteredProperties.map(property => (
-//                     <Paper key={property.id} elevation={3} style={{ margin: '10px 0', padding: '10px' }}>
-//                         <ListItem button onClick={() => handleViewProperty(property)}>
-//                             <ListItemText
-//                                 primary={<Typography variant="h6">{property.title}</Typography>}
-//                                 secondary={
-//                                     <>
-//                                         <Typography variant="body2">Location: {property.location}</Typography>
-//                                         <Typography variant="body2">Price: {property.price}</Typography>
-//                                     </>
-//                                 }
-//                             />
-//                         </ListItem>
-//                     </Paper>
-//                 ))}
-//             </List>
-
-//             {/* View Property Dialog */}
-//             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-//                 <DialogTitle>Property Details</DialogTitle>
-//                 <DialogContent>
-//                     {selectedProperty && (
-//                         <div>
-//                             <Typography variant="h6"><strong>Title:</strong> {selectedProperty.title}</Typography>
-//                             <Typography variant="body1"><strong>Location:</strong> {selectedProperty.location}</Typography>
-//                             <Typography variant="body1"><strong>Price:</strong> {selectedProperty.price}</Typography>
-//                             <Typography variant="body1"><strong>Buyer ID:</strong> {selectedProperty.buyerID}</Typography>
-//                             <Typography variant="body1"><strong>Vendor ID:</strong> {selectedProperty.VendorID}</Typography>
-//                             <Typography variant="body1"><strong>Description:</strong> {selectedProperty.description}</Typography>
-//                         </div>
-//                     )}
-//                 </DialogContent>
-//                 <DialogActions>
-//                     <Button onClick={() => setOpenDialog(false)} color="primary">Close</Button>
-//                 </DialogActions>
-//             </Dialog>
-//         </Container>
-//     );
-// };
-
-// export default PropertyDashboard;

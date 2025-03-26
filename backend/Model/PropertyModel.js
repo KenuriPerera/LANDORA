@@ -17,9 +17,10 @@ const propertySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    availability: {
+        type: Boolean,
+        required: true,
+        default: true
     }
 });
 

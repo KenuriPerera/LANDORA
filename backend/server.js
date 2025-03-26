@@ -20,12 +20,14 @@ app.use(cors({ origin: process.env.CLIENT_URL || '*' })); // Adjust CLIENT_URL i
 const userRoutes = require('./Routes/UserRoutes');
 const authRoutes = require('./Routes/AuthRoutes');
 const maintenanceRequestRoutes = require('./Routes/maintenanceRequestRoutes');
+const propertyRoutes = require('./Routes/PropertyRoutes');
 const router = require('./router');
 
 // Route middleware
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
 app.use('/api/maintenance-requests', maintenanceRequestRoutes);
+app.use('/api/properties', propertyRoutes);
 // Define a route handler for '/api' endpoint
 app.use('/api', router);
 app.use('/api/export', exportRoutes);
