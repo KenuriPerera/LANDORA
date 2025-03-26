@@ -113,7 +113,7 @@ function PropertyList() {
                   }}
                 >
                   <FontAwesomeIcon icon={faSignOutAlt} />
-                  Logout
+                  Logo0ut
                 </Button>
               </Box>
       
