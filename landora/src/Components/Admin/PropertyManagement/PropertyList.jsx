@@ -5,7 +5,7 @@ import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../Auth/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTachometerAlt, faUsers, faSackDollar, faHammer, faSignOutAlt, faBuilding } from '@fortawesome/free-solid-svg-icons';
-import { properties, MntRequests, maintenanceData } from "../Database/Data";
+//import { properties, MntRequests, maintenanceData } from "../Database/Data";
 
 const drawerWidth = 230;
 
@@ -113,7 +113,7 @@ function PropertyList() {
                   }}
                 >
                   <FontAwesomeIcon icon={faSignOutAlt} />
-                  Logo0ut
+                  Logout
                 </Button>
               </Box>
       
